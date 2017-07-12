@@ -1,0 +1,13 @@
+{
+  "name": "trolley",
+  "version": "0.0.1",
+  "description": "Persistent logging and request handling for Express apps.",
+  "main": "index.js",
+  "repository": "https://github.com/austinbillings/trolley",
+  "author": "Austin Billings <me@austinbillings.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.15.3",
+    "zaq": "^1.1.5"
+  }
+}
