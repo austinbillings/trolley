@@ -4,16 +4,16 @@ const stripAnsi = require('strip-ansi');
 
 const Trolley = function ({ enabled = true, path = './', filename = 'trolley.log' } = {}) {
   const trolley = {
-    logger: null,
+    log: null,
     messages: require('./Messages'),
     initialize: () => {
-      trolley.logger = enabled ? fs.createWriteStream(pathUtils.join(path, filename), { flags: 'a' }) : null;
+      trolley.log = enabled ? fs.createWriteStream(pathUtils.join(path, filename), { flags: 'a' }) : null;
     },
     setMessages: (messages) => {
       trolley.messages = Object.assign({}, trolley.messages, messages);
     },
-    log: (line) => {
-      if (trolley.logger) trolley.logger.write(stripAnsi(line) + '\n');
+    logger: (line) => {
+      if (trolley.log) trolley.log.write(stripAnsi(line) + '\n');
     },
     crash: (res, { message = trolley.messages.error, code = 400, obj = null }) => {
       const success = false;
