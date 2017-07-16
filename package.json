@@ -1,6 +1,6 @@
 {
   "name": "trolley",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Persistent logging and request handling for Express apps.",
   "main": "index.js",
   "repository": "https://github.com/austinbillings/trolley",
@@ -8,7 +8,6 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.15.3",
-    "strip-ansi": "^4.0.0",
     "zaq": "^1.1.5"
   }
 }
