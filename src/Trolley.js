@@ -1,22 +1,28 @@
-const path = require('path');
+const fs = require('fs');
+const pathUtils = require('path');
 
-const Trolley = {
-  persistence: {
-    enabled: true,
-    path: './',
-    filename: 'trolley.log'
-  },
-  messages: require('./Messages'),
-  crash (message = Trolley.messages.error, res, code = 400, obj = null) {
-		const success = false;
-		res.status(code).send({ success, message, code });
-		zaq.err(message, obj);
-	}
+const Trolley = function ({ enabled = true, path = './', filename = 'trolley.log' } = {}) {
+  const trolley = {
+    logger: null,
+    messages: require('./Messages'),
+    initialize: () => {
+      trolley.logger = enabled ? fs.createWriteStream(pathUtils.join(path, filename), { flags: 'a' }) : null;
+    },
+    setMessages: (messages) => {
+      trolley.messages = Object.assign({}, trolley.messages, messages);
+    },
+    log: (line) => {
+      if (trolley.logger) trolley.logger.write(line + '\n');
+    },
+    crash: (res, { message = trolley.messages.error, code = 400, obj = null }) => {
+      const success = false;
+      res.status(code).send({ success, message, code });
+      return { message, code, obj };
+    }
+  };
 
-  err (message, obj) {
-    zaq.err(message, obj);
-    if (Trolley.config)
-  }
-};
+  trolley.initialize();
+  return trolley;
+}
 
 module.exports = Trolley;
