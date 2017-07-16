@@ -1,5 +1,6 @@
 const fs = require('fs');
 const pathUtils = require('path');
+const stripAnsi = require('strip-ansi');
 
 const Trolley = function ({ enabled = true, path = './', filename = 'trolley.log' } = {}) {
   const trolley = {
@@ -12,7 +13,7 @@ const Trolley = function ({ enabled = true, path = './', filename = 'trolley.log
       trolley.messages = Object.assign({}, trolley.messages, messages);
     },
     log: (line) => {
-      if (trolley.logger) trolley.logger.write(line + '\n');
+      if (trolley.logger) trolley.logger.write(stripAnsi(line) + '\n');
     },
     crash: (res, { message = trolley.messages.error, code = 400, obj = null }) => {
       const success = false;
