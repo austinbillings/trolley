@@ -14,9 +14,9 @@ const Trolley = function ({ enabled = true, path = './', filename = 'trolley.log
     logger: (line) => {
       if (trolley.log) trolley.log.write(line + '\n');
     },
-    crash: (res, { message = trolley.messages.error, code = 400, obj = null }) => {
-      const success = false;
-      res.status(code).send({ success, message, code });
+    crash: (res, { message = trolley.messages.error, code = 400, obj = null }, callback) => {
+      res.status(code).send({ message, code });
+      if (callback) callback();
       return { message, code, obj };
     }
   };
