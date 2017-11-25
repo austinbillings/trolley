@@ -1,28 +1,40 @@
 const fs = require('fs');
 const pathUtils = require('path');
+const messages = require('./Messages');
 
-const Trolley = function ({ enabled = true, path = './', filename = 'trolley.log' } = {}) {
-  const trolley = {
+const Trolley = function ({ enabled = true, path = './', filename = '.trolley.log' } = {}) {
+  const instance = {
+    messages,
     log: null,
-    messages: require('./Messages'),
     initialize: () => {
-      trolley.log = enabled ? fs.createWriteStream(pathUtils.join(path, filename), { flags: 'a' }) : null;
+      instance.log = enabled
+        ? fs.createWriteStream(pathUtils.join(path, filename), { flags: 'a' })
+        : null;
+      return instance;
     },
     setMessages: (messages) => {
-      trolley.messages = Object.assign({}, trolley.messages, messages);
+      instance.messages = Object.assign({}, instance.messages, messages);
     },
     logger: (line) => {
-      if (trolley.log) trolley.log.write(line + '\n');
+      if (instance.log)
+        instance.log.write(line + '\n');
     },
-    crash: (res, { message = trolley.messages.error, code = 400, obj = null }, callback) => {
+    crash: (res, { message = instance.messages.error, code = 400, obj = null }, callback) => {
       res.status(code).send({ message, code });
-      if (callback) callback();
-      return { message, code, obj };
+      const cause = { message, code, obj };
+      if (callback) callback(cause);
+      if (instance.crashHandlers.length)
+        instance.crashHandlers.forEach(handler => handler(cause));
+      return cause;
+    }
+    crashHandlers: [],
+    onCrash: (handler) => {
+      if (typeof handler === 'function')
+        instance.crashHandlers.push(handler);
     }
   };
 
-  trolley.initialize();
-  return trolley;
+  return instance.initialize();
 }
 
 module.exports = Trolley;
