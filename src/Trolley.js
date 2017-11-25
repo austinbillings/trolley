@@ -21,12 +21,12 @@ const Trolley = function ({ enabled = true, path = './', filename = '.trolley.lo
     },
     crash: (res, { message = instance.messages.error, code = 400, obj = null }, callback) => {
       res.status(code).send({ message, code });
-      const cause = { message, code, obj };
-      if (callback) callback(cause);
+      const report = { message, code, obj };
+      if (callback) callback(report);
       if (instance.crashHandlers.length)
-        instance.crashHandlers.forEach(handler => handler(cause));
-      return cause;
-    }
+        instance.crashHandlers.forEach(handler => handler(report));
+      return report;
+    },
     crashHandlers: [],
     onCrash: (handler) => {
       if (typeof handler === 'function')
