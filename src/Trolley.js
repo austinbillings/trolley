@@ -32,6 +32,7 @@ const Trolley = function ({ enabled = true, path = './', filename = '.trolley.lo
       const handlers = [ callback, ...instance.deliveryHandlers ];
       return instance.respond(res, fullReport, handlers);
     },
+    deliveryHandlers: [],
     crash: (res, report, callback) => {
       const defaults = { message: instance.messages.error, code: 400 };
       const fullReport = Object.assign({}, defaults, report);
