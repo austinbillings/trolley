@@ -27,7 +27,7 @@ const Trolley = function ({ enabled = true, path = './', filename = '.trolley.lo
       return report;
     },
     deliver: (res, report, callback) => {
-      const defaults = { message: instance.messages.success, code: 200 };
+      const defaults = { message: instance.messages.success, code: 200, success: true };
       const fullReport = Object.assign({}, defaults, report);
       const handlers = [ callback, ...instance.deliveryHandlers ];
       return instance.respond(res, fullReport, handlers);
@@ -38,7 +38,7 @@ const Trolley = function ({ enabled = true, path = './', filename = '.trolley.lo
         instance.deliveryHandlers.push(handler);
     },
     crash: (res, report, callback) => {
-      const defaults = { message: instance.messages.error, code: 400 };
+      const defaults = { message: instance.messages.error, code: 400, error: true };
       const fullReport = Object.assign({}, defaults, report);
       const handlers = [ callback, ...instance.crashHandlers ];
       return instance.respond(res, fullReport, handlers);
