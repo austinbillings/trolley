@@ -20,6 +20,7 @@ const Trolley = function ({ enabled = true, path = './', filename = '.trolley.lo
         instance.log.write(line + '\n');
     },
     respond: (res, report = {}, handlers = []) => {
+      const { code } = report;
       res.status(code).send(report);
       if (handlers.length)
         handlers.forEach(handler => handler ? handler(report) : null);
