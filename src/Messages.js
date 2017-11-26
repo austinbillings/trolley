@@ -1,3 +1,4 @@
 module.exports = {
-  error: 'An Error Occurred'
+  error: 'An Unspecified Error Occurred',
+  success: 'Success!'
 };

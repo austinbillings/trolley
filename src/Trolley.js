@@ -19,13 +19,23 @@ const Trolley = function ({ enabled = true, path = './', filename = '.trolley.lo
       if (instance.log)
         instance.log.write(line + '\n');
     },
-    crash: (res, { message = instance.messages.error, code = 400, obj = null }, callback) => {
-      res.status(code).send({ message, code });
-      const report = { message, code, obj };
-      if (callback) callback(report);
-      if (instance.crashHandlers.length)
-        instance.crashHandlers.forEach(handler => handler(report));
+    respond: (res, report = {}, handlers = []) => {
+      res.status(code).send(report);
+      if (handlers.length)
+        handlers.forEach(handler => handler ? handler(report) : null);
       return report;
+    },
+    deliver: (res, report, callback) => {
+      const defaults = { message: instance.messages.success, code: 200 };
+      const fullReport = Object.assign({}, defaults, report);
+      const handlers = [ callback, ...instance.deliveryHandlers ];
+      return instance.respond(res, fullReport, handlers);
+    }),
+    crash: (res, report, callback) => {
+      const defaults = { message: instance.messages.error, code: 400 };
+      const fullReport = Object.assign({}, defaults, report);
+      const handlers = [ callback, ...instance.crashHandlers ];
+      return instance.respond(res, fullReport, handlers);
     },
     crashHandlers: [],
     onCrash: (handler) => {
