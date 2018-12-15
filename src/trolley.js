@@ -1,8 +1,7 @@
 const fs = require('fs')
-const pathUtils = require('path')
 
-const statusCodes = require('./constants/statusCodes')
 const { createResponder } = require('./responder')
+const statusCodes = require('./constants/statusCodes')
 const { wrapSuccess, wrapError, wrapException } = require('./wrappers')
 const { isFunction, isObject, stringify, isFunctionArray, toFunctionArray } = require('./utils')
 
