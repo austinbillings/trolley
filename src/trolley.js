@@ -1,56 +1,69 @@
-const fs = require('fs');
-const pathUtils = require('path');
-const messages = require('./Messages');
+const fs = require('fs')
+const pathUtils = require('path')
 
-const Trolley = function ({ enabled = true, path = './', filename = '.trolley.log' } = {}) {
+const statusCodes = require('./constants/statusCodes')
+const { createResponder } = require('./responder')
+const { wrapSuccess, wrapError, wrapException } = require('./wrappers')
+const { isFunction, isObject, stringify, isFunctionArray, toFunctionArray } = require('./utils')
+
+const create = ({ onRespond, onSend, onDeliver, onCrash, onExplode } = {}) => {
+  const handlers = {
+    all: toFunctionArray(onRespond),
+    send: toFunctionArray(onSend),
+    deliver: toFunctionArray(onDeliver),
+    crash: toFunctionArray(onCrash),
+    explode: toFunctionArray(onExplode)
+  }
+
+  const addHandlersTo = (eventType) => (...handler) => (
+    eventType in handlers && (isFunction(handler) || isFunctionArray(handler))
+      ? handlers[eventType].push(...toFunctionArray(handler))
+      : null
+  )
+
+  const getHandlers = (eventType) => {
+    return eventType in handlers
+      ? [ ...handlers.all, ...handlers[eventType]]
+      : handlers.all
+  }
+
+  const respondAndHandle = (eventType, transformPayload) => (
+    (...args) => createResponder(getHandlers(eventType), transformPayload)(...args)
+  )
+
   const instance = {
-    messages,
-    log: null,
-    initialize: () => {
-      instance.log = enabled
-        ? fs.createWriteStream(pathUtils.join(path, filename), { flags: 'a' })
-        : null;
-      return instance;
-    },
-    setMessages: (messages) => {
-      instance.messages = Object.assign({}, instance.messages, messages);
-    },
-    logger: (line) => {
-      if (instance.log)
-        instance.log.write(line + '\n');
-    },
-    respond: (res, report = {}, handlers = []) => {
-      const { code } = report;
-      res.status(code).send(report);
-      if (handlers.length)
-        handlers.forEach(handler => handler ? handler(report) : null);
-      return report;
-    },
-    deliver: (res, report, callback) => {
-      const defaults = { message: instance.messages.success, code: 200, success: true };
-      const fullReport = Object.assign({}, defaults, report);
-      const handlers = [ callback, ...instance.deliveryHandlers ];
-      return instance.respond(res, fullReport, handlers);
-    },
-    deliveryHandlers: [],
-    onDeliver: (handler) => {
-      if (typeof handler === 'function')
-        instance.deliveryHandlers.push(handler);
-    },
-    crash: (res, report, callback) => {
-      const defaults = { message: instance.messages.error, code: 400, error: true };
-      const fullReport = Object.assign({}, defaults, report);
-      const handlers = [ callback, ...instance.crashHandlers ];
-      return instance.respond(res, fullReport, handlers);
-    },
-    crashHandlers: [],
-    onCrash: (handler) => {
-      if (typeof handler === 'function')
-        instance.crashHandlers.push(handler);
-    }
-  };
+    onRespond: addHandlersTo('all'),
 
-  return instance.initialize();
+    onSend: addHandlersTo('send'),
+    send: respondAndHandle('send'),
+
+    onDeliver: addHandlersTo('deliver'),
+    deliver: respondAndHandle('deliver', wrapSuccess),
+
+    onCrash: addHandlersTo('crash'),
+    crash: respondAndHandle('crash', wrapError),
+
+    onExplode: addHandlersTo('explode'),
+    explode: respondAndHandle('explode', wrapException)
+  }
+
+  return instance
 }
 
-module.exports = Trolley;
+const createLogger = ({ logPath = './.trolley.log', serializer, useLineBreaks = true } = {}) => {
+  const logWriter = fs.createWriteStream(logPath, { flags: 'a' })
+  const serialize = isFunction(serializer) ? serializer : stringify
+
+  return line => logWriter.write(serialize(line) + (useLineBreaks ? '\n' : ''))
+}
+
+const withLogger = (config = {}) => {
+  const logger = createLogger(config)
+  const onRespond = isObject(config)
+    ? [ ...toFunctionArray(config.onRespond), logger ]
+    : [ logger ]
+
+  return create({ ...config, onRespond })
+}
+
+module.exports = { create, createLogger, withLogger }
