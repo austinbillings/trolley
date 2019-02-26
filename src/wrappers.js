@@ -7,7 +7,7 @@ const {
   getPayloadStatusCode
 } = require('./utils')
 
-function createPayloadWrapper (defaultCode, isError) {
+function createPayloadWrapper (defaultCode, isErrorWrapper) {
   return (payload = null, spreadMeta = true) => {
     const timestamp = new Date()
     const code = getPayloadStatusCode(payload, defaultCode)
@@ -16,15 +16,27 @@ function createPayloadWrapper (defaultCode, isError) {
       : statuses[code]
 
     const meta = spreadMeta ? { timestamp, code, statusText } : {}
-    const output = isError && isObject(payload) && payload.error
-      ? payload.error
-      : isObject(payload)
-        ? withoutKeys(payload, ['statusText', 'code'])
-        : payload
+    const output = isObject(payload)
+      ? withoutKeys(payload, ['statusText', 'code'])
+      : payload
 
-    return isError
-      ? { ...meta, error: output }
-      : { ...meta, data: output }
+    if (isErrorWrapper) {
+      const error = isObject(output) && output.error
+        ? output.error
+        : output
+
+      return { ...meta, error }
+    }
+
+    const message = isObject(output) && output.message
+      ? output.message
+      : null
+
+    return message
+      ? { ...meta, message, output: withoutKeys(output, 'message') }
+      : isString(output)
+        ? { ...meta, message: output }
+        : { ...meta, data: output }
   }
 }
 
