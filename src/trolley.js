@@ -53,7 +53,7 @@ const createLogger = ({ logPath = './.trolley.log', serializer, useLineBreaks = 
   const logWriter = fs.createWriteStream(logPath, { flags: 'a' })
   const serialize = isFunction(serializer) ? serializer : stringify
 
-  return line => logWriter.write(serialize(line) + (useLineBreaks ? '\n' : ''))
+  return line => logWriter.write(serialize(line).split('\\n').join('\n') + (useLineBreaks ? '\n' : ''))
 }
 
 const withLogger = (config = {}) => {

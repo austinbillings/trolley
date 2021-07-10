@@ -61,7 +61,7 @@ function toFunctionArray (input) {
 }
 
 function stringify (value) {
-  return JSON.stringify(value)
+  return unwrapQuotes(JSON.stringify(value))
 }
 
 function lowercase (text) {
@@ -148,6 +148,14 @@ function getPayloadStatusCode (payload, defaultCode) {
         : statusCodes.NoContent
 }
 
+function unwrapQuotes (string) {
+  return !isString(string) || !string
+    ? string
+    : string[0] === '"' && string[string.length - 1] === '"'
+      ? string.substring(1, string.length - 1)
+      : string
+}
+
 
 module.exports = {
   isNumber,
@@ -172,5 +180,6 @@ module.exports = {
   kebabCase,
   keys,
   withoutKeys,
-  getPayloadStatusCode
+  getPayloadStatusCode,
+  unwrapQuotes
 }
