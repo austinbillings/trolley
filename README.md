@@ -14,6 +14,8 @@ In action:
 const Trolley = require('./my-trolley-instance.js');
 const { somethingIsWrongWith, allIsGoodWith } = require('./somefile.js');
 
+app.use('/health', (req, res) => Trolley.deliver('API is up and running!', res))
+
 app.use('/myRoute', (req, res) => {
     try {
         if (somethingIsWrongWith(req.data)) {
