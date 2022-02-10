@@ -1,6 +1,6 @@
 {
   "name": "trolley",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Persistent logging and request handling for Express apps.",
   "main": "index.js",
   "repository": "https://github.com/austinbillings/trolley",
