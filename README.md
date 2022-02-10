@@ -1,4 +1,4 @@
-# Trolley
+# 🚋 Trolley
 
 Trolley is an opinionated, easy to use and extensible logging tool and response abstraction for Express-based APIs.
 
