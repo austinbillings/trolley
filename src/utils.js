@@ -141,11 +141,15 @@ function withoutKeys (object, keysToRemove = []) {
 function getPayloadStatusCode (payload, defaultCode) {
   return isObject(payload) && isNumber(payload.code)
     ? payload.code
-    : isNumber(defaultCode)
-      ? defaultCode
-      : payload || isNumber(payload)
-        ? statusCodes.OK
-        : statusCodes.NoContent
+    : isObject(payload) && isNumber(payload.status)
+      ? payload.status
+      : isObject(payload) && isNumber(payload.statusCode)
+        ? payload.statusCode
+        : isNumber(defaultCode)
+          ? defaultCode
+          : payload || isNumber(payload)
+            ? statusCodes.OK
+            : statusCodes.NoContent
 }
 
 function unwrapQuotes (string) {
