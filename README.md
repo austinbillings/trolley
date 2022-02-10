@@ -33,7 +33,7 @@ app.use('/myRoute', (req, res) => {
 
 Trolley.create is the main method used to create a trolley instance. It has methods for flusing responses (`.deliver`, `.crash`, `.explode`, `.send`) as well as methods for adding additional handlers (`.onDeliver`, etc.)
 
-```
+```js
 // my-trolley-instance.js
 
 const trolley = require('trolley');
@@ -48,7 +48,7 @@ module.exports = trolley.create({
 
 
 Responses from .crash and .explode both include some metadata about the failed request, to assist with debugging. Given the above `.crash` usage, the client will receive JSON like this:
-```
+```json
 {
     "timestamp": 1000000000,
     "status": 400,
