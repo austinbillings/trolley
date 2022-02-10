@@ -31,7 +31,7 @@ app.use('/myRoute', (req, res) => {
 
 ## Trolley.create({ config })
 
-Trolley.create is the main method used to create a trolley instance. It has methods for flusing responses (`.deliver`, `.crash`, `.explode`, `.send`) as well as methods for adding additional handlers (`.onDeliver`, etc.)
+Trolley.create is the main method used to create a trolley instance. The resulting instance has methods for flusing responses (`.deliver`, `.crash`, `.explode`, `.send`) as well as methods for adding additional handlers (`.onDeliver`, etc.)
 
 ```js
 // my-trolley-instance.js
