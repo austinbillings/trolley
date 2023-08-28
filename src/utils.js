@@ -1,5 +1,3 @@
-const statusCodes = require('./constants/statusCodes')
-
 function isNumber (value) {
   return typeof value === 'number'
 }
@@ -150,8 +148,8 @@ function getPayloadStatusCode (payload, defaultCode) {
         : isNumber(defaultCode)
           ? defaultCode
           : payload || isNumber(payload)
-            ? statusCodes.OK
-            : statusCodes.NoContent
+            ? 200
+            : 204
 }
 
 function unwrapQuotes (string) {
